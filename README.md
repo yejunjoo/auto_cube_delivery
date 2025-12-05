@@ -22,26 +22,41 @@ An autonomous mobile manipulation project for **"Daily Cube Delivery"**. The rob
 
 
 ## How to Build & Run
-copy this repo under ros2_ws/src/
+* Copy this repo under ros2_ws/src/
 
+```bash
+cd ~/{ros2_workspace}/src
+git clone https://github.com/yejunjoo/auto_cube_delivery.git
+```
+
+* ROS2 build
+```bash
 cd ~/ros2_ws
 colcon build --symlink-install --packages-select auto_cube_delivery
-
 source install/setup.bash
+```
 
-(terminal 1)
+
+* (Terminal 1)
+```bash
 sudo systemctl stop start_app_node.service
 ros2 launch auto_cube_delivery navigation.launch.py map:=map_01
 (change to your map name)
+```
 
-(terminal 2)
+* (Terminal 2)
+```bash
 ros2 launch auto_cube_delivery rviz_navigation.launch.py
+```
 
-(terminal 3)
+* (Terminal 3)
+```bash
 source ~/ros2_ws/install/setup.bash
 ros2 run auto_cube_delivery auto_cube_delivery
 (ros2 run [package name] [command name])
+```
 
-(error)
-ModuleNotFoundError: No module named 'nav2_simple_commander'
+* (Error) ModuleNotFoundError: No module named 'nav2_simple_commander'
+```bash
 sudo apt install ros-humble-nav2-simple-commander
+```
