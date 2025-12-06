@@ -29,26 +29,20 @@ class Database:
     def fill_task_seq(self, seq_list):
         assert len(seq_list) > 0, "Too Short Task Sequence"
         self.task_seq = seq_list
-        return
 
     def fill_zone_dir(self, zone_name, dir):
         assert zone_name in ['zone1', 'zone2', 'zone3'], "Wrong Name for Zone"
         assert dir in ['left', 'middle', 'right'], "Wrong Direction for Zone"
         self.zone_info[zone_name]['dir'] = dir
-        return
 
     def fill_zone_id(self, zone_name, id):
         assert zone_name in ['zone1', 'zone2', 'zone3'], "Wrong Name for Zone"
         self.zone_info[zone_name]['id'] = id
-        return
 
     def fill_cube_info(self, color, direction):
         assert direction in ['left', 'middle', 'right'], "Wrong Direction for Cube"
         assert color in ['red', 'blue', 'green'], "Wrong Color for Cube"
         self.cube_info[color] = direction
 
-        return
-
     def memorize_grasp_angle(self, angle):
         self.grasp_angle = angle
-        return

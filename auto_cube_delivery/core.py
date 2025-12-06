@@ -6,13 +6,21 @@ from auto_cube_delivery.modules.database import Database
 
 def core_process():
     print("Starting Core Process...")
+
+    # ---- Hyper Parameters ----------------- #
     # map frame
     # x, y, yaw
     landmark = [(0.0, 0.0, 0.0),
                 (0.0, 0.0, 0.0),
                 (0.0, 0.0, 0.0)]
 
-    navigator = Navigator()
+    # movable range for initial localization
+    cov_threshold = 0.05
+    move_range_x = (-0.05, 0.05)
+    move_range_y = (-0.03, 0.03)
+    # --------------------------------------- #
+
+    navigator = Navigator(cov_threshold=cov_threshold, move_range_x=move_range_x, move_range_y=move_range_y)
     database = Database(left = landmark[0], middle=landmark[1], right=landmark[2])
 
     landmark_visit_order = ['left', 'middle', 'right']
