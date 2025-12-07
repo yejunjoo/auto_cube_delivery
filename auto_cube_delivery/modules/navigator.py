@@ -59,6 +59,8 @@ class Navigator():
         else:
             print(">>> [Navigator] Warning: Localization Failed.")
 
+        # update start point coordinate in map frame
+        self._update_start_point()
 
     def _amcl_callback(self, msg):
         # called every data-subscription from amcl topic
@@ -105,7 +107,7 @@ class Navigator():
                   f"\nCov_yaw: {self.cov_yaw:.4f}")
 
             if self._spin_and_check():
-                self._update_start_point()
+                # self._update_start_point()
                 self.move_to_start()
                 return True
 
@@ -116,7 +118,7 @@ class Navigator():
                   f"\nCov_yaw: {self.cov_yaw:.4f}")
 
             if self._move_and_check():
-                self._update_start_point()
+                # self._update_start_point()
                 self.move_to_start()
                 return True
 
@@ -210,15 +212,15 @@ class Navigator():
             print(f"[TF Error] Failed to bring Transformation matrix: {e}")
 
     def move_to_start(self):
-        self.set_goal(self.start_point, mode='degrees')
+        self.set_goal(self.start_point, mode='degrees', frame='odom')
 
-    def set_goal(self, coordinate, mode='degrees'):
+    def set_goal(self, coordinate, mode='degrees', frame='map'):
         x = coordinate[0]
         y = coordinate[1]
         yaw = coordinate[2]
 
         goal_pose = PoseStamped()
-        goal_pose.header.frame_id = 'map'   # world frame coordinate
+        goal_pose.header.frame_id = frame   # world frame coordinate
         goal_pose.header.stamp = self.navigator.get_clock().now().to_msg()
 
         # x, y in meter scale
