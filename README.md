@@ -61,3 +61,7 @@ ros2 run auto_cube_delivery auto_cube_delivery
 ```bash
 sudo apt install ros-humble-nav2-simple-commander
 ```
+* (Position Printing)
+```bash
+ros2 run tf2_ros tf2_echo map base_link
+```

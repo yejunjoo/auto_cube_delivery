@@ -12,7 +12,7 @@ def core_process():
     # map frame
     # x, y, yaw
     landmark = [(1.0, 0.0, 0.0),    # left
-                (2.0, 0.0, 0.0),    # middle
+                (1.19, 3.24, -87.9),    # middle
                 (3.0, 0.0, 0.0)]    # right
 
     # movable range for initial localization
