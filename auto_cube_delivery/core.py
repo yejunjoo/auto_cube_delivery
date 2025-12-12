@@ -32,6 +32,7 @@ def core_process():
     task_prompt = None
     ignore_threshold = True
     num_spin = 2
+    TASK_INSTRUCT = "Switch the blue cube and red cube"
     # --------------------------------------- #
 
     navigator = Navigator(cov_threshold=cov_threshold, ignore_threshold=ignore_threshold,
@@ -121,7 +122,7 @@ def core_process():
         # task_seq = gemini.ask_task(task_prompt)
     environment_state = database.to_environment_state()
     print("Environment State:", environment_state)
-    task_instruction = input("Enter task instruction: Put the blue cube in zone 3, and the green cube in zone 2 ")
+    task_instruction = input(TASK_INSTRUCT)
 
     plan_text = create_robot_plan(environment_state, task_instruction)
     print("Gemini Response:\n", plan_text)
