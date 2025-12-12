@@ -336,7 +336,9 @@ class GraspingNode(GraspingNodeBase):
                 rclpy.spin_once(self, timeout_sec=0.01)
                 # time.sleep(0.01) # spin_once가 blocking이 아니면 필요할 수 있음
 
-            self.is_collecting = False # 수집 종료
+            self.is_collecting = False 
+            self.num_collected = 0
+            # 수집 종료
             print("=== Data Collection Complete ===")
 
             # 평균 계산
@@ -411,6 +413,23 @@ class GraspingNode(GraspingNodeBase):
             self.last_q = pulse2angle(default_q)
             self.set_joint_positions(self.last_q, duration=2.0)
             time.sleep(5.0)
+
+            # Check cube existance
+            print("Checking Cube Existance...")
+            self.pose_history.clear()
+            self.is_collecting = True # Vision Callback 활성화
+            
+            start = time.time()
+            while len(self.pose_history) < 1:
+                rclpy.spin_once(self, timeout_sec=0.01)
+                end = time.time()
+                if end-start > 5.0: 
+                    print("=== Robot Grasps the Cube! ===")
+                    self.is_collecting = False
+                    break
+            if (len(self.pose_history) > 0): 
+                print("=== Robot Misses the Cube! ===")
+                self.grasp(self.target_color)
             
             self.gripper_open(duration=1.0)
             time.sleep(1.5)
