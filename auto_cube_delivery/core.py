@@ -61,6 +61,9 @@ def core_process():
         navigation_is_done = navigator.set_goal(database.landmark[direction])
         if navigation_is_done:
             print(f"Arrived at Landmark: {direction}")
+            head_up_q = [500, 700, 100, 250, 500]
+            grasping_node.set_joint_positions_pulse(head_up_q, duration=2.0)
+            time.sleep(5.0)
 
             # Database filling
             # Need to adjust camera pose if needed
