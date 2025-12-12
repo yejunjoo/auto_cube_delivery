@@ -429,6 +429,7 @@ class GraspingNode(GraspingNodeBase):
                     break
             if (len(self.pose_history) > 0):
                 print("=== Robot Misses the Cube! ===")
+                self.num_collected = 0
                 self.grasp(self.target_color)
             
             self.gripper_open(duration=1.0)
