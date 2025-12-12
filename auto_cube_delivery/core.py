@@ -4,12 +4,14 @@ import math
 
 from scipy.stats import invgamma_gen
 
+from auto_cube_delivery.modules.grasping_module.grasping import GraspingNode
 from auto_cube_delivery.modules.navigator import Navigator
 from auto_cube_delivery.modules.database import Database
 
 from auto_cube_delivery.modules.plan_generator import create_robot_plan, parse_final_plan
 from auto_cube_delivery.modules.zone_cube_analyzer import ZoneCubeAnalyzer
 
+from auto_cube_delivery.modules.grasping_module.grasping import GraspingNode
 
 def core_process():
     print("Starting Core Process...")
@@ -18,9 +20,9 @@ def core_process():
     # map frame
     # x, y, yaw
     # map_1212
-    landmark = [(1.0, 0.0, 0.0),    # left
-                (1.19, 3.24, -87.9),    # middle
-                (3.0, 0.0, 0.0)]    # right
+    landmark = [(0.955, -0.805, -56.933),    # left
+                (1.720, 0.203, -49.377),    # middle
+                (2.538, 1.145, -48.462)]    # right
 
     # movable range for initial localization
     cov_threshold = 0.05
@@ -33,21 +35,17 @@ def core_process():
     num_spin = 2
     # --------------------------------------- #
 
-    # Init Navigator
-    # localize with threshold covariance
-    navigator = Navigator(cov_threshold=cov_threshold, ignore_threshold=ignore_threshold, num_spin=num_spin,
+    navigator = Navigator(cov_threshold=cov_threshold, ignore_threshold=ignore_threshold,
+                          num_spin=num_spin,
                           move_range_x=move_range_x, move_range_y=move_range_y)
-
-    # Init Database
-    # Add landmark coordinate
     database = Database(left = landmark[0], middle=landmark[1], right=landmark[2])
 
-    # Init Gemini ##
     analyzer = ZoneCubeAnalyzer(
         image_path="/home/ubuntu/LLM_Planning/capture/capture.jpg",
         wait_before_capture=1.0,  # 필요하면 0.5나 0으로 조정 가능
     )
-    # gemini = Gemini()
+
+    grasping_node = GraspingNode("grasping")
 
     # Visiting Order
     landmark_dist = {'left': -1.0, 'middle': -1.0, 'right':-1.0}
@@ -64,9 +62,8 @@ def core_process():
         if navigation_is_done:
             print(f"Arrived at Landmark: {direction}")
 
-        ##################################################
-        ### 여기서 로봇이 대가리를 안들어도 사진이 잘찍히겠죠? 아니면 여기서 대가리를 들면 될 것 같아요 ###
-
+            # Database filling
+            # Need to adjust camera pose if needed
             zone_num, cube_color = analyzer()
             print(f"[Gemini] direction={direction}, zone={zone_num}, cube={cube_color}")
 
@@ -131,7 +128,10 @@ def core_process():
     print("Parsed Task Sequence:", task_seq)
 
     database.fill_task_seq(task_seq)
+    success = grasping_node.grasp(1)
 
+    # todo: database 형식 바꿔서 grasping node 에 먹여주기
+    # todo: grasping node input parameter 색으로 바꾸기 - 지금은 그냥 e
 
     # Assert type=list, all elements are in action options
     # Fill database with action sequence
