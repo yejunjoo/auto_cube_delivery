@@ -34,7 +34,7 @@ class GraspingNode(GraspingNodeBase):
         # --- Vision Settings ---
         self.target_color = None
         self.cube_size = 0.03
-        self.calib_path = 'resources/camera_calibration.npz'
+        self.calib_path = '/home/ubuntu/ros2_ws/src/auto_cube_delivery/auto_cube_delivery/modules/grasping_module/camera_calibration.npz'
         
         self.color_ranges = {
             'red':   [(np.array([0, 100, 50]), np.array([10, 255, 255])),
