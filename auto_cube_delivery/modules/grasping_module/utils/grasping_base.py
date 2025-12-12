@@ -11,7 +11,6 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import numpy as np
 
-from ..marker_detector import MarkerDetector
 from .kinematics_utils import pulse2angle, angle2pulse
 from .action_group_controller import ActionGroupController
 
@@ -36,7 +35,6 @@ class GraspingNodeBase(Node):
         self.image_sub = self.create_subscription(Image, '/depth_cam/rgb/image_raw', self.image_callback, 1)
         self.bridge = CvBridge()
         self.image = None
-        self.marker_detector = MarkerDetector()
         self.marker_ids = {"red" : 1, "blue" : 6, "green" : 7}
     
     def image_callback(self, msg):
