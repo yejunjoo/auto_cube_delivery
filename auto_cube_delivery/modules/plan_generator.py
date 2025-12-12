@@ -24,16 +24,14 @@ def create_robot_plan(environment_state: List[Dict], task_instruction: str) -> s
 
     # (A) 환경 규칙 설명
     environment_description = f"""
-You are responsible for creating a step-by-step task plan for a mobile manipulator robot.
+You are responsible for generating a valid and executable manipulation plan for a mobile manipulator robot.
 
-Environment rules:
-- There are exactly 3 zones in the corridor: zone 1, zone 2, and zone 3.
-- Exactly two of these zones contain one cube placed on a box.
-- One zone is empty.
-- Cube colors are: red, green, blue.
-- The robot starts at a separate starting point.
-- The robot can carry only one cube at a time.
-- Each zone can hold at most one cube.
+The environment contains:
+- Exactly 3 zones: Zone 1, Zone 2, Zone 3.
+- There are exactly 2 cubes in the environment.
+- There is exactly one cube in each of two zones, and the remaining one zone contains no cube.
+- Cube colors are chosen from (Red, Green, Blue), and the two cubes always have different colors.
+- For example, Environment state: “Zone 1: blue, Zone 2: empty, Zone 3: red”
 """.strip()
 
     # (B) 현재 environment_state
@@ -50,117 +48,164 @@ Task Instruction:
 
     # (D) Action sequence rule that must follow
     output_rule = """
-You must generate an action sequence using ONLY the following action strings:
-- pick(C)  : robot moves to the zone where cube color C is located and picks it up
-             (moving + grasping are both included in this single action)
-- place(Z) : robot moves to zone Z and places the currently held cube there
-             (moving + placing are both included in this single action)
+Your input will always include:
+1. The current environment state (e.g., “Zone 1: blue, Zone 2: empty, Zone 3: red”)
+2. One random task instruction chosen from the following official LLM Random Task List:
 
-Here, C must be one of: R, G, B (for Red, Green, Blue).
-Z must be one of: 1, 2, 3 (for zone 1, zone 2, zone 3).
+==================================================
+LLM RANDOM TASK LIST (11 TASK TYPES)
+==================================================
+#1. Switch the blue cube and red cube / Switch the green cube and red cube.
+Goal:
+- The cube originally located in X's zone must end in Y's zone.
+- The cube originally located in Y's zone must end in X's zone.
+- You MUST use the empty zone as temporary storage.
 
-Action validity rules:
-- You can call pick(C) only if there is a cube with color C somewhere in the environment
-  and that cube has not already been placed in its final target zone in your plan.
-- You can call place(Z) only if the robot is currently holding exactly one cube.
-- After place(Z), zone Z must become occupied by that cube.
+Required 3-step swap algorithm (always the same):
+1) Move cube X to the empty zone.
+      pick(X)
+      place(empty_zone)
+2) Move cube Y to X's original zone.
+      pick(Y)
+      place(X_original_zone)
+3) Move cube X from the empty zone to Y's original zone.
+      pick(X)
+      place(Y_original_zone)
+
+Rules:
+- Never attempt a direct swap.
+- Do not move any cube other than X and Y.
+- This sequence always requires exactly 6 actions.
+
+#2. Place the blue cube at the position of the red cube. / Place the red cube at the position of the green cube.
+Goal:
+- Cube X must end in the zone where cube Y was initially located.
+- Cube Y must NOT be moved under any circumstances.
+
+Required minimal algorithm:
+1) pick(X)
+2) place(Y_original_zone)
+
+Rules:
+- Only cube X is moved.
+- Cube Y remains in its initial position.
+- It is allowed for both cubes to stay in the same zone.
+- This task always requires exactly 2 actions.
+
+#3. Place all cubes in Zone 2. / Place all cubes in Zone 3.
+Goal:
+- Both cubes must end in the target zone (order does not matter).
+
+Required algorithm:
+For each cube:
+    If the cube is not already in the target zone:
+        pick(cube_color)
+        place(target_zone)
+
+Rules:
+- Do not relocate cubes unnecessarily.
+
+#4. Place the red cube in Zone 1 and the blue cube in Zone 2. / Place the green cube in Zone 3 and the red cube in Zone 1.
+Goal:
+- Each cube must be moved to the explicitly assigned target zone.
+
+Required algorithm:
+For each cube C with target zone Z:
+    If C is already in Z → skip
+    Otherwise:
+        pick(C)
+        place(Z)
+
+Rules:
+- It is allowed for multiple cubes to end in the same zone.
+- If another cube is blocking a target zone, use the empty zone temporarily.
+
+#5. If there is any cube in Zone 1, move it to Zone 3. Otherwise, move a cube from Zone 2 to Zone 1. / If there is any cube currently in Zone 2, move it to Zone 1; otherwise, move a cube from Zone 3 to Zone 2.
+Goal:
+- Move exactly one cube according to the condition.
+
+Required algorithm:
+If the condition zone contains a cube:
+    pick(the_cube_in_condition_zone)
+    place(target_zone)
+Else:
+    pick(a_cube_from_alternative_zone)
+    place(target_zone)
+
+Rules:
+- Only one cube must be moved.
+- No unnecessary movements.
+- Empty zone usage is not required.
+
+#6. Place the blue cube in Zone 2 and the red cube in Zone 2.
+Goal:
+- Both blue and red cubes must end in Zone 2.
+
+Required algorithm:
+For each of (Blue, Red):
+    If the cube is already in Zone 2 → skip
+    Otherwise:
+        pick(C)
+        place(2)
+
+Rules:
+- It is allowed for multiple cubes to be in Zone 2 simultaneously.
+- No need to clear the zone before placing a cube.
+- Do not use the empty zone unnecessarily.
+
+==================================================
+
+Your job:
+- Interpret the environment state + the random task instruction.
+- Compute the final desired cube positions.
+- Then produce a VALID action sequence using ONLY the following actions:
+
+==================================================
+ACTION DEFINITIONS
+==================================================
+pick(C)
+    - Move to the zone that currently contains cube C and pick it up.
+      (Both navigation + grasp happen inside this action.)
+
+place(Z)
+    - Move to Zone Z and place the currently held cube.
+      (Both navigation + placing happen inside this action.)
+
+Where:
+  C ∈ {R, G, B}
+  Z ∈ {1, 2, 3}
+
+==================================================
+ACTION RULES (VERY IMPORTANT)
+==================================================
 - The robot can hold only one cube at a time.
+- A pick must ALWAYS be followed by a place.
+- You must never output two consecutive picks or two consecutive places.
+- The plan must have an EVEN number of actions.
 
-SEQUENCE PATTERN (MUST ALWAYS HOLD):
-- The action sequence MUST:
-  - start with pick(...)
-  - then strictly alternate: pick, place, pick, place, ...
-  - have an EVEN number of actions (2, 4, or 6 actions for this task)
-- You must NOT have two consecutive picks or two consecutive places.
+==================================================
+IMPORTANT OUTPUT FORMAT
+==================================================
+Your response MUST contain TWO parts:
 
-# EXAMPLE 1 SIMPLE CASE (NO SWAP NEEDED):
-Initial state:
-- Zone 1: Blue cube (B)
-- Zone 2: Green cube (G)
-- Zone 3: Empty
+(1) Natural-language reasoning
+    Explain how you interpreted the instruction,
+    how you inferred the target zone for each cube,
+    and why the chosen sequence of actions is valid.
 
-Task Instruction:
-"Put the blue cube in zone 3, and the green cube in zone 2."
-
-In this case, the green cube is already at its correct target zone (zone 2),
-so you only need to move the blue cube from zone 1 to zone 3.
-
-A valid (and minimal) action sequence is:
+(2) FINAL_PLAN:
+    Then output ONLY the plan in the following strict format:
 
 FINAL_PLAN:
-pick(B)   
-place(3)  
+pick(C)
+place(Z)
+pick(C)
+place(Z)
+...
 
-# EXAMPLE 2 SWAP CASE (USING EMPTY ZONE AS TEMPORARY STORAGE):
-Initial state:
-- Zone 1: Blue cube (B)
-- Zone 2: Green cube (G)
-- Zone 3: Empty
-
-Task Instruction:
-"Put the blue cube in zone 2, and the green cube in zone 1."
-
-In this situation, there is no extra cube and only one empty zone (zone 3).
-To satisfy the instruction, you must:
-
-1) First move the Blue cube to the empty zone (zone 3).
-2) Then move the Green cube to the original position of Blue (zone 1).
-3) Finally, move the Blue cube from the temporary zone (zone 3) to its final target zone (zone 2).
-
-A valid action sequence is:
-
-FINAL_PLAN:
-pick(B)   
-place(3)  
-pick(G)   
-place(1)  
-pick(B)   
-place(2)  
-
-In this example:
-- You used the empty zone (zone 3) as a temporary storage.
-- The sequence strictly follows: pick, place, pick, place, pick, place.
-
-# EXAMPLE 3 Simple SWAP CASE (USING EMPTY ZONE AS TEMPORARY STORAGE):
-Initial state:
-- Zone 1: Blue cube (B)
-- Zone 2: Green cube (G)
-- Zone 3: Empty
-
-Task Instruction:
-"Put the blue cube in zone 3, and the green cube in zone 1."
-
-In this situation, the robot must use the empty zone (zone 3) as temporary storage
-to free the target zone for the green cube. The correct sequence of operations is:
-
-1) Move the Blue cube from zone 1 to the empty zone (zone 3).
-2) Move the Green cube from zone 2 to zone 1.
-
-A valid action sequence is:
-
-FINAL_PLAN:
-pick(B)   
-place(3)  
-pick(G)   
-place(1)  
-
-This completes the goal:
-- Blue is now correctly placed at zone 3
-- Green is now correctly placed at zone 1
-- No further actions are required
-
-IMPORTANT:
-- Your action sequence MUST always:
-  - start with pick(...)
-  - alternate pick, place, pick, place, ...
-  - have an even number of actions (2, 4, or 6), depending on the task.
-- You must NEVER break the pick → place → pick → place pattern.
-
-Output format (overall):
-1) First, explain your reasoning step-by-step in natural language.
-2) Then output ONLY:
-   - the 'FINAL_PLAN:' line
-   - followed by each action on its own line (e.g., 'pick(B)', 'place(3)', ...)
+Do NOT add anything after the final action.
+Do NOT add code blocks.
+Do NOT add explanations after FINAL_PLAN.
 """.strip()
 
 
