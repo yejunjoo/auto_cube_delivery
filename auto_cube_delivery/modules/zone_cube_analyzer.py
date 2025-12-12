@@ -61,7 +61,7 @@ class ZoneCubeAnalyzer:
 You are analyzing a single RGB image taken by a robot in front of a wall.
 
 In the scene:
-- On the wall, there is a text indicating the zone number. It is always one of: "1", "2", or "3".
+- On the wall, there is a text indicating the zone number. It is always one of: "Zone 1", "Zone 2", or "Zone 3".
 - On a black small box below, there may be a small regular hexahedron cube. Its color is always one of: red, blue, or green.
 - Sometimes there might be NO cube.
 

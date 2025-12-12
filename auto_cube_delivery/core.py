@@ -61,53 +61,54 @@ def core_process():
         ##################################################
         ### 여기서 로봇이 대가리를 안들어도 사진이 잘찍히겠죠? 아니면 여기서 대가리를 들면 될 것 같아요 ###
 
-        zone_num, cube_color = analyzer()
-        print(f"[Gemini] direction={direction}, zone={zone_num}, cube={cube_color}")
+            zone_num, cube_color = analyzer()
+            print(f"[Gemini] direction={direction}, zone={zone_num}, cube={cube_color}")
 
-        database.fill_zone_num(direction, zone_num)
-        if cube_color is not None:
-            database.fill_cube_info(cube_color, direction)
+            database.fill_zone_num(direction, zone_num)
+            if cube_color is not None:
+                database.fill_cube_info(cube_color, direction)
 
-            # Move Arm to Marker Reading Position
+                # Move Arm to Marker Reading Position
 
-            # Read Image - 이미지 어떻게 가져오지??
+                # Read Image - 이미지 어떻게 가져오지??
 
-            # if use_zone_marker:
-                # using aruco marker for zone detection
+                # if use_zone_marker:
+                    # using aruco marker for zone detection
 
-                # Read Zone marker using marker detection code
-                # zone_id = marker_detector.detect_id(img)
-                # - what if the cube marker is also detected?
+                    # Read Zone marker using marker detection code
+                    # zone_id = marker_detector.detect_id(img)
+                    # - what if the cube marker is also detected?
+
+                    # Fill database
+                    # database.fill_zone_id(direction, zone_id)
+
+                # else:
+                    # Not using marker for zone detection
+                    # Use gemini
+
+                    # Read Zone number using gemini
+                    # zone_num = gemini.ask_zone_num(img)
+
+                    # Fill database
+                    # database.fill_zone_num(direction, zone_num)
+
+                # Read Cube color using Gemini
+                # use gemini
+                # - cube_color = gemini.ask_cube_color(img)
+                #
+                # Or use yolo, cut the cube patch, then ask gemini
+                # Or use yolo, cut the cube patch, then use color distance metric
+                # within (red, blue, green) colors
+                #
+                # - what if no cube? Empty zone?
 
                 # Fill database
-                # database.fill_zone_id(direction, zone_id)
-
-            # else:
-                # Not using marker for zone detection
-                # Use gemini
-
-                # Read Zone number using gemini
-                # zone_num = gemini.ask_zone_num(img)
-
-                # Fill database
-                # database.fill_zone_num(direction, zone_num)
-
-            # Read Cube color using Gemini
-            # use gemini
-            # - cube_color = gemini.ask_cube_color(img)
-            #
-            # Or use yolo, cut the cube patch, then ask gemini
-            # Or use yolo, cut the cube patch, then use color distance metric
-            # within (red, blue, green) colors
-            #
-            # - what if no cube? Empty zone?
-
-            # Fill database
-            # database.fill_cube_info(cube_color, direction)
+                # database.fill_cube_info(cube_color, direction)
 
         else:
             print(f"Failed to go to Landmark: {direction}")
             assert False
+        
 
     navigator.move_to_start()
 
@@ -115,7 +116,7 @@ def core_process():
         # task_seq = gemini.ask_task(task_prompt)
     environment_state = database.to_environment_state()
     print("Environment State:", environment_state)
-    task_instruction = input("Enter task instruction: ")
+    task_instruction = input("Enter task instruction: Put the blue cube in zone 3, and the green cube in zone 2 ")
 
     plan_text = create_robot_plan(environment_state, task_instruction)
     print("Gemini Response:\n", plan_text)
