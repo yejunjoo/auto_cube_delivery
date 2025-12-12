@@ -128,10 +128,34 @@ def core_process():
     print("Parsed Task Sequence:", task_seq)
 
     database.fill_task_seq(task_seq)
-    success = grasping_node.grasp(1)
+
+    print("\n------------------------------------\n")
+    print("\t\tGemini Summary")
+    print(database.zone_info)
+    print(database.cube_info)
+    print(database.dir_to_cube_info)
+    print(database.task_seq)
+    print("\n------------------------------------\n")
+
+
+# Just test workflow for grasping
+    for direction in landmark_visit_order:
+        navigation_is_done = navigator.set_goal(database.landmark[direction])
+        if navigation_is_done:
+            print(f"Arrived at Landmark: {direction}")
+            cube_color = database.dir_to_cube_info[direction]
+            print(f"Picking up: {cube_color}")
+            success = grasping_node.grasp(cube_color)
+            print("Pick and Place succeed")
+        else:
+            print(f"Failed to go to Landmark: {direction}")
+            assert False
+
+
 
     # todo: database 형식 바꿔서 grasping node 에 먹여주기
-    # todo: grasping node input parameter 색으로 바꾸기 - 지금은 그냥 e
+    # todo: grasping node input parameter 색으로 바꾸기 - 지금은 그냥 "red"으로 하드코딩 되어있음.
+    # todo: MPPI local minima escape
 
     # Assert type=list, all elements are in action options
     # Fill database with action sequence

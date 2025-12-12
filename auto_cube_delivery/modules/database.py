@@ -18,6 +18,8 @@ class Database:
         self.cube_info = {'red':None,
                          'blue':None,
                          'green':None}
+        self.dir_to_cube_info = {}
+
         self.grasp_angle = None
 
     # def fill_landmark(self, direction, coordinate):
@@ -45,6 +47,11 @@ class Database:
         assert direction in ['left', 'middle', 'right'], "Wrong Direction for Cube"
         assert color in ['red', 'blue', 'green'], "Wrong Color for Cube"
         self.cube_info[color] = direction
+
+    def fill_dir_to_cube_info(self, direction, color):
+        assert direction in ['left', 'middle', 'right'], "Wrong Direction for Cube"
+        assert color in ['red', 'blue', 'green'], "Wrong Color for Cube"
+        self.dir_to_cube_info[direction] = color
 
     def memorize_grasp_angle(self, angle):
         self.grasp_angle = angle

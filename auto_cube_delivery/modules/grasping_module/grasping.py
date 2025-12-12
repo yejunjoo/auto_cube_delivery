@@ -32,7 +32,7 @@ class GraspingNode(GraspingNodeBase):
         self.last_detected_pose = None # 최종 계산된 평균 Pose (4x4)
 
         # --- Vision Settings ---
-        self.target_color = 'red'
+        self.target_color = None
         self.cube_size = 0.03
         self.calib_path = 'resources/camera_calibration.npz'
         
@@ -309,8 +309,9 @@ class GraspingNode(GraspingNodeBase):
     #########################################################################################################################
     ## TODO : Implement the following functions to complete the grasping functionality.
 
-    def grasp(self, target_marker_id: int | str) -> bool:
+    def grasp(self, cube_color: int | str) -> bool:
         is_success = False
+        self.target_color = cube_color
         try:
             # 현재 조인트 상태 저장
             default_q = [500, 700, 100, 250, 500]
