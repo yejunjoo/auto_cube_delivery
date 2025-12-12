@@ -137,6 +137,19 @@ def core_process():
     print(database.task_seq)
     print("\n------------------------------------\n")
 
+    cube_info_list = [("red", "left"),
+                      ("green", "middle"),
+                      ("blue", "right")]
+
+    for info in cube_info_list:
+        database.fill_cube_info(info[0], info[1])
+        database.fill_dir_to_cube_info(info[1], info[0])
+
+    print("\n------------------------------------\n")
+    print("\t\tHand-added Info Summary")
+    print(database.cube_info)
+    print(database.dir_to_cube_info)
+    print("\n------------------------------------\n")
 
 # Just test workflow for grasping
     for direction in landmark_visit_order:
@@ -154,7 +167,6 @@ def core_process():
 
 
     # todo: database 형식 바꿔서 grasping node 에 먹여주기
-    # todo: grasping node input parameter 색으로 바꾸기 - 지금은 그냥 "red"으로 하드코딩 되어있음.
     # todo: MPPI local minima escape
 
     # Assert type=list, all elements are in action options
