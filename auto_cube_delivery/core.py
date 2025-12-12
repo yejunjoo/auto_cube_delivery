@@ -2,6 +2,8 @@
 import rclpy
 import math
 
+from scipy.stats import invgamma_gen
+
 from auto_cube_delivery.modules.navigator import Navigator
 from auto_cube_delivery.modules.database import Database
 
@@ -11,22 +13,26 @@ def core_process():
     # ---- Hyper Parameters ----------------- #
     # map frame
     # x, y, yaw
+    # map_1212
     landmark = [(1.0, 0.0, 0.0),    # left
                 (1.19, 3.24, -87.9),    # middle
                 (3.0, 0.0, 0.0)]    # right
 
     # movable range for initial localization
     cov_threshold = 0.05
-    move_range_x = (-0.05, 0.05)
-    move_range_y = (-0.03, 0.03)
+    move_range_x = (-0.00, 0.00)
+    move_range_y = (-0.00, 0.00)
 
     use_zone_marker = True
     task_prompt = None
+    ignore_threshold = True
+    num_spin = 2
     # --------------------------------------- #
 
     # Init Navigator
     # localize with threshold covariance
-    navigator = Navigator(cov_threshold=cov_threshold, move_range_x=move_range_x, move_range_y=move_range_y)
+    navigator = Navigator(cov_threshold=cov_threshold, ignore_threshold=ignore_threshold, num_spin=num_spin,
+                          move_range_x=move_range_x, move_range_y=move_range_y)
 
     # Init Database
     # Add landmark coordinate

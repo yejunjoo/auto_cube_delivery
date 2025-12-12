@@ -9,7 +9,7 @@ import time
 
 
 class Navigator():
-    def __init__(self, cov_threshold, move_range_x=(0.0, 0.0), move_range_y=(0.0, 0.0)):
+    def __init__(self, cov_threshold, ignore_threshold, num_spin=1, move_range_x=(0.0, 0.0), move_range_y=(0.0, 0.0)):
         if not rclpy.ok():
             rclpy.init()
 
@@ -26,6 +26,8 @@ class Navigator():
 
         # initial covariance
         self.cov_threshold = cov_threshold
+        self.ignore_threshold = ignore_threshold
+        self.num_spin = num_spin
         self.move_range_x = move_range_x
         self.move_range_y = move_range_y
 
@@ -131,6 +133,10 @@ class Navigator():
                       (self.cov_y < self.cov_threshold) and \
                       (self.cov_yaw < self.cov_threshold)
 
+        if self.ignore_threshold:
+            print(f"Cov_x: {self.cov_x:.4f}\nCov_y: {self.cov_y:.4f}\nCov_yaw: {self.cov_yaw:.4f}")
+            return False
+
         if done_update:
             print(f"Done Localization. Cov Threshold: {self.cov_threshold}")
             print(f"Cov_x: {self.cov_x:.4f}\nCov_y: {self.cov_y:.4f}\nCov_yaw: {self.cov_yaw:.4f}")
@@ -139,7 +145,7 @@ class Navigator():
             return False
 
     def _spin_and_check(self):
-        self.navigator.spin(spin_dist=3.14*2, time_allowance=30)
+        self.navigator.spin(spin_dist=3.14*2*self.num_spin, time_allowance=30)
         while not self.navigator.isTaskComplete():
             time.sleep(0.5)
 
