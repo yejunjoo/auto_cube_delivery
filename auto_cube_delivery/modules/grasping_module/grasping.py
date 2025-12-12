@@ -306,6 +306,13 @@ class GraspingNode(GraspingNodeBase):
         pulse = angle2pulse(q)
         self.set_joint_positions_pulse(pulse, duration) # Base function method
 
+    def set_joint_positions_pulse(self, pulse, duration):
+        '''
+        pulse: list or numpy array of joint pulses
+        duration: time to move in seconds
+        '''
+        self.set_joint_positions_pulse(pulse, duration) # Base function method
+    
     #########################################################################################################################
     ## TODO : Implement the following functions to complete the grasping functionality.
 
