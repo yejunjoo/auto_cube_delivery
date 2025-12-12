@@ -48,3 +48,38 @@ class Database:
 
     def memorize_grasp_angle(self, angle):
         self.grasp_angle = angle
+    
+
+
+    def to_environment_state(self):
+        """
+        create_robot_plan()에서 요구하는 형식으로
+        environment_state 리스트를 생성
+        [
+            {"zone": 1, "cube_color": ...},
+            {"zone": 2, "cube_color": ...},
+            {"zone": 3, "cube_color": ...}
+        ]
+        """
+
+        # 1) zone 번호 -> cube color 매핑 초기화
+        zone_to_cube = {1: None, 2: None, 3: None}
+
+        # 2) cube_info(color -> direction) 기반으로 zone 번호 찾기
+        for color, direction in self.cube_info.items():
+            if direction is None:
+                continue
+
+            # direction ('left', 'middle', 'right') → zone 번호
+            zone_num = self.zone_info[direction]['num']
+            zone_to_cube[zone_num] = color
+
+        # 3) 최종 리스트 생성
+        env = []
+        for z in [1, 2, 3]:
+            env.append({
+                "zone": z,
+                "cube_color": zone_to_cube[z]
+            })
+
+        return env
