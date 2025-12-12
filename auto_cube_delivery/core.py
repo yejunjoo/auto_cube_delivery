@@ -23,6 +23,15 @@ def core_process():
                 (1.720, 0.203, -49.377),    # middle
                 (2.538, 1.145, -48.462)]    # right
 
+    # map_1212_2
+    landmark = [(0.731, 2.468, -4.0), # left
+                (0.766, 1.287, -4.586), # middle
+                (0.752, 0.129, -2.723)] # right
+    landmark = [(0.731, 2.468, -4.0), # left
+                (0.766, 1.287, -4.586), # middle
+                (0.752, 0.129, -2.723)] # right
+
+
     # movable range for initial localization
     cov_threshold = 0.05
     move_range_x = (-0.00, 0.00)
@@ -62,7 +71,7 @@ def core_process():
         if navigation_is_done:
             print(f"Arrived at Landmark: {direction}")
             head_up_q = [500, 700, 100, 250, 500]
-            grasping_node.set_joint_positions_pulse(head_up_q, duration=2.0)
+            grasping_node.set_joint_positions_pulse_2(head_up_q, duration=2.0)
             time.sleep(5.0)
 
             # Database filling
