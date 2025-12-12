@@ -423,11 +423,11 @@ class GraspingNode(GraspingNodeBase):
             while len(self.pose_history) < 1:
                 rclpy.spin_once(self, timeout_sec=0.01)
                 end = time.time()
-                if end-start > 5.0: 
+                if end-start > 5.0:
                     print("=== Robot Grasps the Cube! ===")
                     self.is_collecting = False
                     break
-            if (len(self.pose_history) > 0): 
+            if (len(self.pose_history) > 0):
                 print("=== Robot Misses the Cube! ===")
                 self.grasp(self.target_color)
             
