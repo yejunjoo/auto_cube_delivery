@@ -32,7 +32,6 @@ def core_process():
     w2_right = (1.672, 0.919, 90.0)
     w1_back = (1.069, 0.470, -90.0)
 
-
     landmark = [w1, p1_right, p1, p1_back, w2_left, w2, p2, p2_back, w2_back, w2_right, w1_back ]
 
     p1_path = []
@@ -58,18 +57,41 @@ def core_process():
     assert  start_point_curr is not None
 
 
-    for idx, way_point in enumerate(landmark):
+    start_p1 = [w1, p1]
+    start_p2 = [w1, w2, p2]
+    p1_p2 = [w2, p2]
+    p1_start = [w1_back, navigator.start_point]
+    p2_p1 = [w2_back, p1]
+    p2_start = [w2_back, w1_back, navigator.start_point]
+
+
+    # start -> p1 -> p2
+    move_order = [start_p1, p1_p2]
+    for to_goal_point in move_order:
+        for way_point in to_goal_point:
+            navigation_is_done = navigator.set_goal(way_point)
+            if navigation_is_done:
+                print(f"Arrived at Way Point")
+            else:
+                print(f"Failed to go to Way Point")
+                assert False, "Failed to move"
+
+        print(f"Arrived at Goal Point")
+        # arrives at p1 and p2
+
+        # Add actions HERE!
+        # Add actions HERE!
+        # Add actions HERE!
+
+
+    # p2 -> start
+    for way_point in p2_start:
         navigation_is_done = navigator.set_goal(way_point)
         if navigation_is_done:
-            print(f"Arrived at Way Point {idx+1}")
+            print(f"Arrived at Way Point")
         else:
-            print(f"Failed to go to Way Point {idx+1}")
-
-    navigator.move_to_start()
-
-    time.sleep(300.0)
-    assert False
-
+            print(f"Failed to go to Way Point")
+            assert False, "Failed to move"
 
 
 
