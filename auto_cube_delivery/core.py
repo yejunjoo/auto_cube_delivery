@@ -18,20 +18,25 @@ def core_process():
     # ---- Hyper Parameters ----------------- #
     # map frame
     # x, y, yaw
-    # map 1218
 
-    r2 = (-0.003, 0.880, 49.696)
-    r1 = (1.232, 1.187, -81.645)
-    r0 = (1.281, 0.587, -76.153)
+    # ------ map_nav_test --------- #
+    w1 = (1.069, 0.470, 81.401)
+    p1_right = (1.130, 0.911, 81.401)
+    p1 = (1.130, 0.911, 178.548)
+    p1_back = (1.130, 0.911, 0.0)
+    w2_left = (1.672, 0.919, 1.845)
+    w2 = (1.672, 0.919, 1.845)
+    p2 = (1.762, 0.420, -86.034)
+    p2_back = (1.762, 0.420, 90.0)
+    w2_back = (1.672, 0.919, 90.0)
+    w2_right = (1.672, 0.919, 90.0)
+    w1_back = (1.069, 0.470, -90.0)
 
-    m2 = (0.349, -0.784, -54.177)
-    m0 = (1.346, -0.759, 79.505)
-    m1 = (1.352, -1.251, 85.828)
 
-    l1 = (1.385, -1.781, -176.587)
-    l0 = (0.747, -1.862, -178.8)
+    landmark = [w1, p1_right, p1, p1_back, w2_left, w2, p2, p2_back, w2_back, w2_right, w1_back ]
 
-    landmark = [r2, r1, r0, m2, m1, m0, l1, l0]
+    p1_path = []
+    # ------ map nav_test --------- #
 
     num_spin = 2
     use_zone_marker = True
@@ -39,10 +44,6 @@ def core_process():
     ignore_threshold = True
     TASK_INSTRUCT = "Switch the blue cube and red cube"
     # --------------------------------------- #
-
-    # navigator = Navigator(cov_threshold=cov_threshold, ignore_threshold=ignore_threshold,
-    #                       num_spin=num_spin,
-    #                       move_range_x=move_range_x, move_range_y=move_range_y)
 
     navigator = Navigator(num_spin=num_spin)
     database = Database(left = landmark[0], middle=landmark[1], right=landmark[2])

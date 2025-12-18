@@ -22,7 +22,7 @@ from collections import deque
 # 1. Pose Estimator Class (변경 없음)
 # =====================================================================
 class CubePoseEstimator:
-    def __init__(self, cube_size, calib_file_path='resources/camera_calibration.npz'):
+    def __init__(self, cube_size, calib_file_path='/home/ubuntu/ros2_ws/src_auto_cube_delivery/auto_cube_delivery/modules/grasping_module/camera_calibration.npz'):
         self.cube_size = cube_size
         if not os.path.exists(calib_file_path):
             raise FileNotFoundError(f"Calibration file '{calib_file_path}' not found!")
@@ -106,7 +106,7 @@ class CubePoseNode(Node):
         # 설정
         self.target_color = 'red'  
         self.cube_size = 0.03
-        self.calib_path = 'resources/camera_calibration.npz'
+        self.calib_path = '/home/ubuntu/ros2_ws/src_auto_cube_delivery/auto_cube_delivery/modules/grasping_module/camera_calibration.npz'
 
         self.color_ranges = {
             'red':   [(np.array([0, 100, 50]), np.array([10, 255, 255])),

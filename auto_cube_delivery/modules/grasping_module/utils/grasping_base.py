@@ -18,7 +18,8 @@ from .action_group_controller import ActionGroupController
 class GraspingNodeBase(Node):
     def __init__(self, name):
         # Initialize ROS2 node
-        rclpy.init()
+        if not rclpy.ok():
+            rclpy.init()
         super().__init__(name, allow_undeclared_parameters=True, automatically_declare_parameters_from_overrides=True)
 
         # Servo control

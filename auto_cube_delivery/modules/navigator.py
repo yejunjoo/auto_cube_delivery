@@ -26,9 +26,9 @@ class Navigator():
         # self.move_range_x = move_range_x
         # self.move_range_y = move_range_y
 
-        # self.cov_x = 999.0
-        # self.cov_y = 999.0
-        # self.cov_yaw = 999.0
+        self.cov_x = 999.0
+        self.cov_y = 999.0
+        self.cov_yaw = 999.0
         self.pose_sub = self.navigator.create_subscription(PoseWithCovarianceStamped,
                                                            '/amcl_pose',
                                                            self._amcl_callback,
