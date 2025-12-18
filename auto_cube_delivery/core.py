@@ -18,60 +18,68 @@ def core_process():
     # ---- Hyper Parameters ----------------- #
     # map frame
     # x, y, yaw
-    # map_1212
-    landmark = [(0.955, -0.805, -56.933),    # left
-                (1.720, 0.203, -49.377),    # middle
-                (2.538, 1.145, -48.462)]    # right
+    # map 1218
 
-    # map_1212_2
-    landmark = [(0.731, 2.468, -4.0), # left
-                (0.766, 1.287, -4.586), # middle
-                (0.752, 0.129, -2.723)] # right
-    landmark = [(0.731, 2.468, -4.0), # left
-                (0.766, 1.287, -4.586), # middle
-                (0.752, 0.129, -2.723)] # right
+    r2 = (-0.003, 0.880, 49.696)
+    r1 = (1.232, 1.187, -81.645)
+    r0 = (1.281, 0.587, -76.153)
 
+    m2 = (0.349, -0.784, -54.177)
+    m0 = (1.346, -0.759, 79.505)
+    m1 = (1.352, -1.251, 85.828)
 
-    landmark = [(),
-                ]
+    l1 = (1.385, -1.781, -176.587)
+    l0 = (0.747, -1.862, -178.8)
 
+    landmark = [r2, r1, r0, m2, m1, m0, l1, l0]
 
-    # movable range for initial localization
-    cov_threshold = 0.05
-    move_range_x = (-0.00, 0.00)
-    move_range_y = (-0.00, 0.00)
-
+    num_spin = 2
     use_zone_marker = True
     task_prompt = None
     ignore_threshold = True
-    num_spin = 2
     TASK_INSTRUCT = "Switch the blue cube and red cube"
     # --------------------------------------- #
 
-    navigator = Navigator(cov_threshold=cov_threshold, ignore_threshold=ignore_threshold,
-                          num_spin=num_spin,
-                          move_range_x=move_range_x, move_range_y=move_range_y)
-    database = Database(left = landmark[0], middle=landmark[1], right=landmark[2])
+    # navigator = Navigator(cov_threshold=cov_threshold, ignore_threshold=ignore_threshold,
+    #                       num_spin=num_spin,
+    #                       move_range_x=move_range_x, move_range_y=move_range_y)
 
+    navigator = Navigator(num_spin=num_spin)
+    database = Database(left = landmark[0], middle=landmark[1], right=landmark[2])
     analyzer = ZoneCubeAnalyzer(
         image_path="/home/ubuntu/LLM_Planning/capture/capture.jpg",
         wait_before_capture=1.0,  # 필요하면 0.5나 0으로 조정 가능
     )
-
     grasping_node = GraspingNode("grasping")
+
+
+    start_point_curr = navigator.start_point
+    assert  start_point_curr is not None
+
+
+    for idx, way_point in enumerate(landmark):
+        navigation_is_done = navigator.set_goal(way_point)
+        if navigation_is_done:
+            print(f"Arrived at Way Point {idx+1}")
+        else:
+            print(f"Failed to go to Way Point {idx+1}")
+
+    navigator.move_to_start()
+
+    time.sleep(300.0)
+    assert False
+
+
+
+
+
 
     # Visiting Order
     landmark_dist = {'left': -1.0, 'middle': -1.0, 'right':-1.0}
-    start_point_curr = navigator.start_point
-    assert  start_point_curr is not None
 
     for direction in landmark_dist:
         landmark_dist[direction] = math.dist(database.landmark[direction][0:2], start_point_curr[0:2])
     landmark_visit_order = sorted(landmark_dist, key=landmark_dist.get)
-
-
-
-
 
     # Visit from the closest
     for direction in landmark_visit_order:
