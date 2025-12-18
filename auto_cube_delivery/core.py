@@ -32,6 +32,10 @@ def core_process():
                 (0.752, 0.129, -2.723)] # right
 
 
+    landmark = [(),
+                ]
+
+
     # movable range for initial localization
     cov_threshold = 0.05
     move_range_x = (-0.00, 0.00)
@@ -65,6 +69,10 @@ def core_process():
         landmark_dist[direction] = math.dist(database.landmark[direction][0:2], start_point_curr[0:2])
     landmark_visit_order = sorted(landmark_dist, key=landmark_dist.get)
 
+
+
+
+
     # Visit from the closest
     for direction in landmark_visit_order:
         navigation_is_done = navigator.set_goal(database.landmark[direction])
@@ -78,7 +86,15 @@ def core_process():
 
             # Database filling
             # Need to adjust camera pose if needed
-            zone_num, cube_color = analyzer()
+            # zone_num, cube_color = analyzer()
+
+            response = analyzer()
+            if response in None:
+                break
+            else:
+                zone_num = response[0]
+                cube_color = response[1]
+
             print(f"[Gemini] direction={direction}, zone={zone_num}, cube={cube_color}")
 
             database.fill_zone_num(direction, zone_num)

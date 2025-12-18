@@ -79,9 +79,9 @@ def launch_setup(context):
     # else:
     #     controller_param = os.path.join(navigation_package_path, 'config/nav2_controller_dwb.yaml')
 
-    #controller_param = os.path.join(navigation_package_path, 'config/nav2_controller_teb.yaml')
-    controller_param = os.path.join(navigation_package_path, 'config/nav2_controller_dwb.yaml')
-    #controller_param = os.path.join(navigation_package_path, 'config/nav2_controller_mppi.yaml')
+    # controller_param = os.path.join(navigation_package_path, 'config/nav2_controller_teb.yaml')
+    # controller_param = os.path.join(navigation_package_path, 'config/nav2_controller_dwb.yaml')
+    controller_param = os.path.join(navigation_package_path, 'config/nav2_controller_mppi.yaml')
 
     load_composable_nodes = LoadComposableNodes(
         target_container=container_name_full,

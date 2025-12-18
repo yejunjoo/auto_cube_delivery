@@ -6,6 +6,7 @@ import json
 
 from google import genai
 from google.genai import types
+from google.genai import errors
 
 API_KEY = os.environ["API_KEY"]
 _client = genai.Client(api_key=API_KEY)
@@ -46,6 +47,8 @@ class ZoneCubeAnalyzer:
 
         image_part = self._load_image_part()
         raw_text = self._ask_gemini(image_part)
+        if not raw_text:
+            return None
         zone_num, cube_color = self._parse_json(raw_text)
         return zone_num, cube_color
 
@@ -81,10 +84,17 @@ STRICT OUTPUT FORMAT (very important):
 - "cube_color" must be one of "red", "blue", "green", or null if no cube is present.
         """.strip()
 
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=[image_part, prompt],
-        )
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=[image_part, prompt],
+            )
+        except errors.ServerError as e:
+            # 503, 500 등 구글 서버 문제 (잠시 후 재시도 필요)
+            print(f"Server Error (503 etc) \n{e}")
+            return False
+
+
 
         return response.text.strip()
 
